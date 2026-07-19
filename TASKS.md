@@ -84,10 +84,10 @@ This is the official development task tracker for the **HamzaTech Aura X1** eCom
 - [x] Build **User Account Dashboard**:
   - [x] Order history logs
   - [x] Shipping address configuration form
-- [ ] Build **Admin Dashboard**:
-  - [ ] Orders oversight list (Pending, Shipped, Delivered)
-  - [ ] Sales overview charts (Revenue over time, conversion metrics)
-  - [ ] Database administration table for managing reviews (approve/flag reviews)
+- [x] Build **Admin Dashboard**:
+  - [x] Orders oversight list (Pending, Shipped, Delivered)
+  - [x] Sales overview charts (Revenue over time, conversion metrics)
+  - [x] Database administration table for managing reviews (approve/flag reviews)
 
 ## Phase 6: Optimization, Validation, and Deployment
 - [x] Perform **SEO & Accessibility Audit**:
