@@ -133,12 +133,24 @@ export function CheckoutClient() {
       const taxAmount = subtotal * 0.08;
       const grandTotal = subtotal - discountAmount + taxAmount + shippingFee;
 
-      const items = cartItems.map((item) => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-        price: item.product.price,
-        variant: getColorVariant(item.product.name, item.product.id),
-      }));
+      const items = cartItems.map((item) => {
+        // Map legacy mock product IDs to valid seeded UUIDs
+        let productId = item.product.id;
+        if (productId === "aura-x1-orange" || productId === "aura-x1-headphones") {
+          productId = "00000000-0000-0000-0000-000000000001";
+        } else if (productId === "aura-x1-black") {
+          productId = "00000000-0000-0000-0000-000000000002";
+        } else if (productId === "aura-x1-white") {
+          productId = "00000000-0000-0000-0000-000000000003";
+        }
+
+        return {
+          productId,
+          quantity: item.quantity,
+          price: item.product.price,
+          variant: getColorVariant(item.product.name, item.product.id),
+        };
+      });
 
       const orderRes = await placeOrderAction({
         subtotal,
