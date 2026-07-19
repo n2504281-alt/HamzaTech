@@ -62,9 +62,20 @@ export function CheckoutClient() {
     let isValid = false;
 
     if (currentStep === 1) {
-      isValid = await trigger(["fullName", "email", "phone", "company"]);
+      isValid = await trigger([
+        "fullName",
+        "email",
+        "phone",
+        "company",
+        "address1",
+        "address2",
+        "country",
+        "city",
+        "state",
+        "postalCode",
+      ]);
     } else if (currentStep === 2) {
-      isValid = await trigger(["address1", "address2", "country", "city", "state", "postalCode"]);
+      isValid = true; // Shipping selection is always valid
     } else if (currentStep === 3) {
       isValid = true; // Payment method choice (UI is self-validating)
     }
