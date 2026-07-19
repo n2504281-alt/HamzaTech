@@ -26,8 +26,13 @@ export function ProductInfo({ selectedColor, onColorChange }: ProductInfoProps) 
       black: "Carbon Black",
       white: "Ceramic White",
     };
+    const colorIds = {
+      orange: "00000000-0000-0000-0000-000000000001",
+      black: "00000000-0000-0000-0000-000000000002",
+      white: "00000000-0000-0000-0000-000000000003",
+    };
     return {
-      id: `aura-x1-${selectedColor}`,
+      id: colorIds[selectedColor],
       name: `HamzaTech Aura X1 — ${colorNames[selectedColor]}`,
       description: "Premium Wireless ANC Headphones with Spatial Audio",
       price: 399.00,

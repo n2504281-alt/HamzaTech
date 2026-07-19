@@ -22,8 +22,8 @@ export function Hero() {
 
   // Mock product object for adding to cart
   const auraX1Product = {
-    id: "aura-x1-headphones",
-    name: "HamzaTech Aura X1",
+    id: "00000000-0000-0000-0000-000000000001",
+    name: "HamzaTech Aura X1 — Orange Edition",
     description: "Premium Wireless ANC Headphones",
     price: 399.00,
     image_url: "/images/headphones_hero.png",
