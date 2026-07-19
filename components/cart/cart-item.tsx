@@ -21,6 +21,12 @@ export function CartItem({ item }: CartItemProps) {
 
   // Extract color variant from name or ID
   const getColorVariant = () => {
+    if (product.id === "aura-buds-pro-colorless") {
+      return "Aura Buds Pro";
+    }
+    if (product.id === "aura-soundbar-x-colorless") {
+      return "Aura Soundbar X";
+    }
     if (product.name.includes("Carbon Black") || product.id.includes("black")) {
       return "Carbon Black";
     }
@@ -64,13 +70,13 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-0.5">
             <span className="text-[10px] font-bold text-accent uppercase tracking-widest">
-              HamzaTech Aura X1
+              {product.name.startsWith("HamzaTech ") ? "HamzaTech" : "Accessory Set"}
             </span>
             <h3 className="font-heading text-base sm:text-lg font-bold text-foreground leading-tight">
-              Aura X1
+              {product.name.replace("HamzaTech ", "")}
             </h3>
             <span className="text-xs font-semibold text-muted-foreground mt-0.5">
-              Variant: <span className="text-foreground">{getColorVariant()}</span>
+              {product.id.includes("colorless") ? "Special Accessory" : <>Variant: <span className="text-foreground">{getColorVariant()}</span></>}
             </span>
           </div>
 

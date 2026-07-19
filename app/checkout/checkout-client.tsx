@@ -95,6 +95,12 @@ export function CheckoutClient() {
   const subtotal = useCartStore((state) => state.getTotalPrice());
 
   const getColorVariant = (name: string, id: string) => {
+    if (id === "aura-buds-pro-colorless") {
+      return "Aura Buds Pro";
+    }
+    if (id === "aura-soundbar-x-colorless") {
+      return "Aura Soundbar X";
+    }
     if (name.includes("Carbon Black") || id.includes("black")) {
       return "Carbon Black";
     }
@@ -135,13 +141,15 @@ export function CheckoutClient() {
 
       const items = cartItems.map((item) => {
         // Map legacy mock product IDs to valid seeded UUIDs
-        let productId = item.product.id;
+        let productId: string | null = item.product.id;
         if (productId === "aura-x1-orange" || productId === "aura-x1-headphones") {
           productId = "00000000-0000-0000-0000-000000000001";
         } else if (productId === "aura-x1-black") {
           productId = "00000000-0000-0000-0000-000000000002";
         } else if (productId === "aura-x1-white") {
           productId = "00000000-0000-0000-0000-000000000003";
+        } else if (productId === "aura-buds-pro-colorless" || productId === "aura-soundbar-x-colorless") {
+          productId = null;
         }
 
         return {

@@ -18,7 +18,7 @@ import {
 interface OrderItemWithProduct {
   id: string;
   order_id: string;
-  product_id: string;
+  product_id: string | null;
   quantity: number;
   price: number;
   variant: string;
@@ -373,8 +373,10 @@ export default function OrdersManager() {
                             )}
                           </div>
                           <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-white truncate">{item.products?.name || "Aura X1"}</span>
-                            <span className="text-[10px] text-muted-foreground">Color Variant: {item.variant}</span>
+                            <span className="text-white truncate">{item.products?.name || item.variant || "Aura X1"}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {item.products?.name ? `Color Variant: ${item.variant}` : "Special Accessory Set"}
+                            </span>
                           </div>
                         </div>
                         <div className="flex items-center gap-6 text-right shrink-0">
