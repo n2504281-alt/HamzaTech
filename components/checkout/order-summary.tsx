@@ -55,10 +55,10 @@ export function OrderSummary({
   const grandTotal = subtotal - discountAmount + taxAmount + shippingFee;
 
   const getColorVariant = (name: string, id: string) => {
-    if (id === "aura-buds-pro-colorless") {
+    if (id.includes("buds-pro") || name.toLowerCase().includes("buds")) {
       return "Aura Buds Pro";
     }
-    if (id === "aura-soundbar-x-colorless") {
+    if (id.includes("soundbar") || name.toLowerCase().includes("soundbar")) {
       return "Aura Soundbar X";
     }
     if (name.includes("Carbon Black") || id.includes("black")) {
@@ -97,7 +97,7 @@ export function OrderSummary({
                 {item.product.name.replace("HamzaTech ", "")}
               </h4>
               <span className="text-[10px] text-muted-foreground font-semibold mt-0.5">
-                {item.product.id.includes("colorless") ? "Special Accessory" : `Color: ${getColorVariant(item.product.name, item.product.id)}`}
+                {item.product.id.includes("colorless") || item.product.id.includes("buds-pro") || item.product.id.includes("soundbar") ? "Special Accessory" : `Color: ${getColorVariant(item.product.name, item.product.id)}`}
               </span>
               <span className="text-[10px] text-muted-foreground font-light">
                 Qty: {item.quantity} x ${item.product.price.toFixed(2)}

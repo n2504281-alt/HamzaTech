@@ -95,10 +95,10 @@ export function CheckoutClient() {
   const subtotal = useCartStore((state) => state.getTotalPrice());
 
   const getColorVariant = (name: string, id: string) => {
-    if (id === "aura-buds-pro-colorless") {
+    if (id.includes("buds-pro") || name.toLowerCase().includes("buds")) {
       return "Aura Buds Pro";
     }
-    if (id === "aura-soundbar-x-colorless") {
+    if (id.includes("soundbar") || name.toLowerCase().includes("soundbar")) {
       return "Aura Soundbar X";
     }
     if (name.includes("Carbon Black") || id.includes("black")) {
@@ -148,7 +148,11 @@ export function CheckoutClient() {
           productId = "00000000-0000-0000-0000-000000000002";
         } else if (productId === "aura-x1-white") {
           productId = "00000000-0000-0000-0000-000000000003";
-        } else if (productId === "aura-buds-pro-colorless" || productId === "aura-soundbar-x-colorless") {
+        }
+
+        // Bulletproof check: if it is still not a valid UUID format, map to null
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId || "");
+        if (!isUuid) {
           productId = null;
         }
 

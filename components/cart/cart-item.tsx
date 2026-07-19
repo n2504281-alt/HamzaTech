@@ -21,10 +21,10 @@ export function CartItem({ item }: CartItemProps) {
 
   // Extract color variant from name or ID
   const getColorVariant = () => {
-    if (product.id === "aura-buds-pro-colorless") {
+    if (product.id.includes("buds-pro") || product.name.toLowerCase().includes("buds")) {
       return "Aura Buds Pro";
     }
-    if (product.id === "aura-soundbar-x-colorless") {
+    if (product.id.includes("soundbar") || product.name.toLowerCase().includes("soundbar")) {
       return "Aura Soundbar X";
     }
     if (product.name.includes("Carbon Black") || product.id.includes("black")) {
@@ -76,7 +76,7 @@ export function CartItem({ item }: CartItemProps) {
               {product.name.replace("HamzaTech ", "")}
             </h3>
             <span className="text-xs font-semibold text-muted-foreground mt-0.5">
-              {product.id.includes("colorless") ? "Special Accessory" : <>Variant: <span className="text-foreground">{getColorVariant()}</span></>}
+              {product.id.includes("colorless") || product.id.includes("buds-pro") || product.id.includes("soundbar") ? "Special Accessory" : <>Variant: <span className="text-foreground">{getColorVariant()}</span></>}
             </span>
           </div>
 
