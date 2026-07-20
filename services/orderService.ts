@@ -8,13 +8,14 @@ export const orderService = {
   async createOrder(input: OrderInput, userId: string | null): Promise<{ data: Order | null; error: ServiceError | null }> {
     const supabase = await createClient();
 
-    // 1. Verify inventory stock for all products
+    // 1. Verify inventory stock for DB-linked products only.
+    // Items with productId not found in the DB (e.g. hardcoded cart products
+    // like Aura X1 colour variants) are skipped gracefully — their productId
+    // will already be set to null by the sanitizer in the action layer.
     for (const item of input.items) {
       if (!item.productId) continue;
       const { data: prod } = await productService.getProductById(item.productId);
-      if (!prod) {
-        return { data: null, error: new Error(`Product reference not found: ${item.productId}`) };
-      }
+      if (!prod) continue; // Not a DB-tracked product — skip stock check
       if (prod.stock < item.quantity) {
         return { data: null, error: new Error(`Insufficient stock for product: ${prod.name}`) };
       }

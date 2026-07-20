@@ -27,9 +27,9 @@ export function ProductInfo({ selectedColor, onColorChange }: ProductInfoProps) 
       white: "Ceramic White",
     };
     const colorIds = {
-      orange: "00000000-0000-0000-0000-000000000001",
-      black: "00000000-0000-0000-0000-000000000002",
-      white: "00000000-0000-0000-0000-000000000003",
+      orange: "aura-x1-orange",
+      black: "aura-x1-black",
+      white: "aura-x1-white",
     };
     return {
       id: colorIds[selectedColor],
