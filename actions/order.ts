@@ -16,10 +16,8 @@ export async function placeOrderAction(orderData: OrderInput) {
     const userId = user ? user.id : null;
 
     // Validate inputs
-    console.log("Order Data:", JSON.stringify(orderData, null, 2));
     const parsed = orderSchema.safeParse(orderData);
     if (!parsed.success) {
-      console.error("Validation failed:", parsed.error.format());
       return {
         success: false,
         error: parsed.error.issues[0]?.message || "Invalid order details",

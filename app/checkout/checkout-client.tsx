@@ -139,22 +139,14 @@ export function CheckoutClient() {
       const taxAmount = subtotal * 0.08;
       const grandTotal = subtotal - discountAmount + taxAmount + shippingFee;
 
-      const items = cartItems.map((item) => {
-        // Map legacy mock product IDs to valid seeded UUIDs
-        let productId: string | null = item.product.id;
-        if (productId === "aura-x1-orange" || productId === "aura-x1-headphones") {
-          productId = "00000000-0000-0000-0000-000000000001";
-        } else if (productId === "aura-x1-black") {
-          productId = "00000000-0000-0000-0000-000000000002";
-        } else if (productId === "aura-x1-white") {
-          productId = "00000000-0000-0000-0000-000000000003";
-        }
+      const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-        // Bulletproof check: if it is still not a valid UUID format, map to null
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId || "");
-        if (!isUuid) {
-          productId = null;
-        }
+      const items = cartItems.map((item) => {
+        // Only pass productId if it is already a real UUID (i.e. fetched from the DB).
+        // All legacy slugs (aura-x1-orange, aura-buds-pro-colorless, etc.) are mapped
+        // to null so they never violate Zod uuid() or Supabase FK constraints.
+        const rawId = item.product.id;
+        const productId: string | null = UUID_REGEX.test(rawId) ? rawId : null;
 
         return {
           productId,
