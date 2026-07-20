@@ -15,14 +15,20 @@ export async function placeOrderAction(orderData: OrderInput) {
 
     const userId = user ? user.id : null;
 
-    // Sanitize: map any non-UUID productId to null before Zod validation.
-    // This prevents "Invalid product ID reference" for legacy slugs or
-    // recommended accessory IDs that are not real database UUIDs.
+    // Sanitize: map any non-UUID productId or shippingAddressId to null before
+    // Zod validation. This prevents FK constraint violations for legacy slugs,
+    // recommended accessory IDs, or missing/invalid address references.
     const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const sanitizedData = {
       ...orderData,
+      // Ensure shippingAddressId is a valid UUID or null (guest checkout safe)
+      shippingAddressId:
+        orderData.shippingAddressId && UUID_REGEX.test(orderData.shippingAddressId)
+          ? orderData.shippingAddressId
+          : null,
       items: orderData.items.map((item) => ({
         ...item,
+        // Ensure productId is a valid UUID or null (accessory/legacy items safe)
         productId: item.productId && UUID_REGEX.test(item.productId) ? item.productId : null,
       })),
     };
