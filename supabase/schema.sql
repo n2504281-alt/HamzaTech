@@ -199,7 +199,7 @@ create policy "Allow users to manage own addresses" on public.addresses for all 
 
 -- Orders Policies
 create policy "Allow users to view own orders" on public.orders for select using (auth.uid() = profile_id or public.is_admin());
-create policy "Allow users to create own orders" on public.orders for insert with check (auth.uid() = profile_id or public.is_admin());
+create policy "Allow users to create own orders" on public.orders for insert with check (auth.uid() = profile_id or profile_id is null or public.is_admin());
 create policy "Allow admins update access for orders" on public.orders for update using (public.is_admin());
 
 -- Order Items Policies
@@ -207,7 +207,7 @@ create policy "Allow users to view own order items" on public.order_items for se
   exists (select 1 from public.orders where id = order_id and (profile_id = auth.uid() or public.is_admin()))
 );
 create policy "Allow users to insert order items" on public.order_items for insert with check (
-  exists (select 1 from public.orders where id = order_id and (profile_id = auth.uid() or public.is_admin()))
+  exists (select 1 from public.orders where id = order_id and (profile_id = auth.uid() or profile_id is null or public.is_admin()))
 );
 
 -- Reviews Policies
