@@ -30,7 +30,11 @@ export type AddressInput = z.infer<typeof addressSchema>;
 
 // 4. Order Item schema helper
 export const orderItemSchema = z.object({
-  productId: z.string().uuid("Invalid product ID reference").nullable(),
+  // productId can be any string or null — UUID sanitization happens in the
+  // action layer before this schema runs, so we don’t enforce .uuid() here.
+  // Enforcing uuid() caused false rejections for legacy/placeholder IDs still
+  // sitting in users’ persisted localStorage carts.
+  productId: z.string().nullable(),
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
   price: z.number().min(0, "Item price must be positive"),
   variant: z.string().min(1, "Variant name is required"),
