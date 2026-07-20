@@ -24,7 +24,7 @@ export function OrderSummary({
   const [couponCode, setCouponCode] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(discountPercent > 0);
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = couponCode.trim().toUpperCase();
 
@@ -33,12 +33,32 @@ export function OrderSummary({
       return;
     }
 
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: couponData } = await supabase
+        .from("coupons")
+        .select("*")
+        .eq("code", code)
+        .eq("active", true)
+        .single();
+
+      if (couponData) {
+        onApplyDiscount(couponData.discount_percent);
+        setIsCouponApplied(true);
+        toast.success(`Coupon '${code}' applied! ${couponData.discount_percent}% Discount has been deducted.`);
+        return;
+      }
+    } catch {
+      // Fallback local check
+    }
+
     if (code === "AURA20") {
       onApplyDiscount(20);
       setIsCouponApplied(true);
       toast.success("Coupon 'AURA20' applied! 20% Discount has been deducted.");
     } else {
-      toast.error("Invalid coupon code. Try 'AURA20' for testing.");
+      toast.error(`Invalid or inactive coupon code "${code}".`);
     }
   };
 

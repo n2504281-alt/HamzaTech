@@ -98,14 +98,13 @@ export default function OrdersManager() {
   const handleUpdateStatus = async (orderId: string, newStatus: Order["status"]) => {
     try {
       const supabase = createClient();
-      
-      // Map newStatus to shipping status too if appropriate
+
       const updateFields: Partial<Order> = { status: newStatus };
       if (newStatus === "shipped") {
         updateFields.shipping_status = "shipped";
       } else if (newStatus === "delivered") {
         updateFields.shipping_status = "delivered";
-        updateFields.payment_status = "paid"; // Deliveries imply paid
+        updateFields.payment_status = "paid";
       }
 
       const { error } = await supabase
@@ -114,16 +113,70 @@ export default function OrdersManager() {
         .eq("id", orderId);
 
       if (error) throw error;
-      
+
       toast.success(`Order status updated to ${newStatus}`);
       fetchOrders();
       if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder((prev) => prev ? { ...prev, ...updateFields } : null);
+        setSelectedOrder((prev) => (prev ? { ...prev, ...updateFields } : null));
       }
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : "Failed to update order state";
       toast.error(errMsg);
     }
+  };
+
+  const handleUpdatePaymentStatus = async (orderId: string, newPaymentStatus: Order["payment_status"]) => {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("orders")
+        .update({ payment_status: newPaymentStatus })
+        .eq("id", orderId);
+
+      if (error) throw error;
+      toast.success(`Payment status updated to ${newPaymentStatus}`);
+      fetchOrders();
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev) => (prev ? { ...prev, payment_status: newPaymentStatus } : null));
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Failed to update payment status";
+      toast.error(errMsg);
+    }
+  };
+
+  const exportOrdersCSV = () => {
+    if (!orders.length) {
+      toast.error("No orders available to export.");
+      return;
+    }
+
+    const headers = ["Order Number", "Date", "Status", "Payment Status", "Shipping Status", "Subtotal", "Tax", "Shipping Fee", "Grand Total"];
+    const rows = orders.map((o) => [
+      o.order_number,
+      new Date(o.created_at).toLocaleDateString(),
+      o.status,
+      o.payment_status,
+      o.shipping_status,
+      o.subtotal,
+      o.tax,
+      o.shipping_fee,
+      o.grand_total,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `HamzaTech_Orders_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Orders CSV exported successfully!");
+  };
+
+  const handlePrintInvoice = () => {
+    window.print();
   };
 
   const columns = [
@@ -258,13 +311,22 @@ export default function OrdersManager() {
     <div className="flex flex-col gap-6 w-full text-left select-none relative">
       
       {/* Title Panel */}
-      <div>
-        <h1 className="font-heading text-2xl font-black text-foreground uppercase tracking-wider">
-          Order Management
-        </h1>
-        <p className="text-xs text-muted-foreground font-light mt-0.5">
-          Process payments, manage shipping routes, cancel receipts, and inspect order invoices.
-        </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border/30 pb-4">
+        <div>
+          <h1 className="font-heading text-2xl font-black text-foreground uppercase tracking-wider">
+            Order Management
+          </h1>
+          <p className="text-xs text-muted-foreground font-light mt-0.5">
+            Process payments, manage shipping routes, cancel receipts, and inspect order invoices.
+          </p>
+        </div>
+
+        <button
+          onClick={exportOrdersCSV}
+          className="h-10 rounded-full border border-border/60 bg-muted/10 hover:bg-muted/20 text-foreground text-xs font-bold px-5 transition flex items-center gap-2"
+        >
+          <FileText className="h-4 w-4 text-accent" /> Export Orders CSV
+        </button>
       </div>
 
       {/* Orders List Table */}
@@ -413,7 +475,51 @@ export default function OrdersManager() {
                   </div>
                 </div>
 
-                {/* Change status inside modal */}
+                {/* Payment Status Manual Toggle & Print Controls */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/15 pt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground">Payment Status:</span>
+                    <button
+                      onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "paid")}
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
+                        selectedOrder.payment_status === "paid"
+                          ? "bg-green-500/20 text-green-500 border-green-500/40"
+                          : "bg-muted/10 text-muted-foreground hover:bg-muted/20 border-border/40"
+                      }`}
+                    >
+                      Mark Paid
+                    </button>
+                    <button
+                      onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "unpaid")}
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
+                        selectedOrder.payment_status === "unpaid"
+                          ? "bg-orange-500/20 text-orange-500 border-orange-500/40"
+                          : "bg-muted/10 text-muted-foreground hover:bg-muted/20 border-border/40"
+                      }`}
+                    >
+                      Mark Unpaid
+                    </button>
+                    <button
+                      onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "refunded")}
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
+                        selectedOrder.payment_status === "refunded"
+                          ? "bg-red-500/20 text-red-500 border-red-500/40"
+                          : "bg-muted/10 text-muted-foreground hover:bg-muted/20 border-border/40"
+                      }`}
+                    >
+                      Refunded
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handlePrintInvoice}
+                    className="px-4 h-8 rounded-full border border-border/50 bg-muted/10 hover:bg-muted/20 text-white text-xs font-bold transition flex items-center gap-1.5"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-accent" /> Print Invoice
+                  </button>
+                </div>
+
+                {/* Change shipping status inside modal */}
                 {selectedOrder.status !== "delivered" && selectedOrder.status !== "cancelled" && (
                   <div className="flex flex-wrap gap-3 border-t border-border/15 pt-4">
                     <button

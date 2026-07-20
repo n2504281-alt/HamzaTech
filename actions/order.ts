@@ -72,3 +72,39 @@ export async function placeOrderAction(orderData: OrderInput) {
     };
   }
 }
+
+export async function trackOrderAction(orderNumber: string) {
+  try {
+    const cleanNum = orderNumber.trim();
+    if (!cleanNum) {
+      return { success: false, error: "Please enter a valid order number." };
+    }
+
+    const supabase = await createClient();
+    const { data: order, error } = await supabase
+      .from("orders")
+      .select("*")
+      .ilike("order_number", cleanNum)
+      .single();
+
+    if (error || !order) {
+      return { success: false, error: `No order found matching "${cleanNum}". Please verify your order number.` };
+    }
+
+    const { data: items } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", order.id);
+
+    return {
+      success: true,
+      data: {
+        ...order,
+        items: items || [],
+      },
+    };
+  } catch (e: unknown) {
+    const errorMsg = e instanceof Error ? e.message : "Failed to retrieve order tracking information.";
+    return { success: false, error: errorMsg };
+  }
+}

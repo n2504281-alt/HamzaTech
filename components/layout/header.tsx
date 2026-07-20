@@ -52,7 +52,7 @@ export function Header() {
     { name: "Aura X1", href: "/product/aura-x1" },
     { name: "Features", href: "/#features" },
     { name: "Showcase", href: "/#showcase" },
-    { name: "Specifications", href: "#specifications" },
+    { name: "Track Order", href: "/track-order" },
     { name: "Reviews", href: "#reviews" },
     { name: "FAQ", href: "#faq" },
   ];
